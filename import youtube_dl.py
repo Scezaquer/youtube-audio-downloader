@@ -5,11 +5,16 @@ import logging
 from pydub import AudioSegment
 from os import remove
 from re import split, finditer
+import traceback
 
 def download_ytvid_as_mp3(vid_id):
     #Download video
     url = f"https://www.youtube.com/watch?v={vid_id}"
-    video_info = youtube_dl.YoutubeDL().extract_info(url = url,download=False)
+    try:
+        video_info = youtube_dl.YoutubeDL().extract_info(url = url,download=False)
+    except Exception:
+        print(traceback.format_exc())
+        return
     ext = video_info["ext"]
     extensions = ["webm", "mp4", "m4a", "mp3"]
     if ext in extensions: extensions.remove(ext)
@@ -40,8 +45,9 @@ def download_ytvid_as_mp3(vid_id):
 
         except:
             print(f"Failed {x}")
-            try: remove(f"audio/{video_info['title']}.{x}")
-            except: pass
+            if x != extensions[-1]:
+                try: remove(f"audio/{video_info['title']}.{x}")
+                except: pass
     print("COULD NOT DOWNLOAD, MOVING TO NEXT")
 
 def tag(filepath, video_info):
@@ -72,17 +78,7 @@ def tag(filepath, video_info):
 
     audiofile.tag.save()
 
-def download_playlist(url, excluding=[], starting=None, until=None):
-    """
-    url : str (url of the playlist)
-    excluding: list[str] (ids of video to exclude)
-    starting: str (id of first video to download)
-    until: str (id of the last video to download)
-    
-    Downloads an entire youtube playlist using the specified url, with possibility to exclude some
-    and specify start/end
-    """
-
+def get_playlist_ids(url):
     playlist_id = url[-34:]
     ids = []
     # Scraping and extracting the video
@@ -102,15 +98,54 @@ def download_playlist(url, excluding=[], starting=None, until=None):
             if page[x[0]+16:x[0]+27] not in ids:
                 ids.append(page[x[0]+16:x[0]+27])
     
+    return ids
+
+def download_playlist(url, use_history = True, excluding=[], starting=None, until=None):
+    """
+    url : str (url of the playlist)
+    use_history : bool (If set to True, the function will only download everything it hasn't previously downloaded)
+    excluding: list[str] (ids of video to exclude)
+    starting: str (id of first video to download)
+    until: str (id of the last video to download)
+    
+    Downloads an entire youtube playlist using the specified url, with possibility to exclude some
+    and specify start/end
+    """
+
+    playlist_id = url[-34:]
+    ids = get_playlist_ids(url)
+    
     start = 0 if starting is None else ids.index(starting)
     end = len(ids) if until is None else ids.index(until)
     ids = ids[start:end]
     for x in excluding:
-        ids.remove(x)
+        if x in ids: ids.remove(x)
+
+    #Don't re-download previously downloaded songs 
+    history = []
+    try:
+        with open(f"download_memory/{playlist_id}.txt", "r") as file:
+            history = file.read().split("\n")
+    except FileNotFoundError: pass
+    for x in history:
+        if x in ids: ids.remove(x)
+
     print(ids, len(ids))
 
     for x in ids:
         download_ytvid_as_mp3(x)
+        save_download(playlist_id, [x])
+
+def save_download(playlist_id, ids):
+    with open(f"download_memory/{playlist_id}.txt", "a") as file:
+        for x in ids: file.write(x + "\n")
+
+def mark_playlist_as_downloaded(url):
+    #Marks the entire playlist as having been already downloaded without installing anything
+    ids = get_playlist_ids(url)
+    playlist_id = url[-34:]
+    with open(f"download_memory/{playlist_id}.txt", "a") as file:
+        for x in ids: file.write(x + "\n")
 
 url = "https://www.youtube.com/playlist?list=PLHd5WXDxcD4C0jAxhtFCJoXbMIgG5EB27"
-download_playlist(url, ["T23AY5gYhpE"], "pK98oaV3bII", "-AFdwoyNT24")
+download_playlist(url, use_history=True, excluding=["T23AY5gYhpE"], starting="WTKrJ-nEy40", until="-AFdwoyNT24")
