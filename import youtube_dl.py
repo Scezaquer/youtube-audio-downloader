@@ -40,7 +40,7 @@ def download_ytvid_as_mp3(vid_id):
 
         except:
             print(f"Failed {x}")
-            try: remove(f"audio/{video_info['title']}.{ext}")
+            try: remove(f"audio/{video_info['title']}.{x}")
             except: pass
     print("COULD NOT DOWNLOAD, MOVING TO NEXT")
 
