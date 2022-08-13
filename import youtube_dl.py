@@ -57,14 +57,20 @@ def tag(filepath, video_info):
     audiofile = eyed3.load(filepath)
 
     title = video_info["title"]
+    artist = ""
     if "-" in title:
         title = split(" - | -|- |-", title, maxsplit=1)
-        audiofile.tag.artist = title[0]
+        artist = title[0]
         audiofile.tag.title = title[1]
     
     else:
-        audiofile.tag.artist = video_info["uploader"]
+        artist = video_info["uploader"]
         audiofile.tag.title = video_info["title"]
+    
+    if artist.endswith(" - Topic"):
+        artist = artist[:-8]
+    artist = artist.lower()
+    artist = artist.title()
 
     # Get album art image
     thumbnail_url = f"http://img.youtube.com/vi/{video_info['id']}/0.jpg"
@@ -153,8 +159,8 @@ def mark_playlist_as_downloaded(url):
     with open(f"download_memory/{playlist_id}.txt", "w") as file:
         for x in ids: file.write(x + "\n")
 
-url = "https://www.youtube.com/playlist?list=PLHd5WXDxcD4C0jAxhtFCJoXbMIgG5EB27"
-
+#url = "https://www.youtube.com/playlist?list=PLHd5WXDxcD4C0jAxhtFCJoXbMIgG5EB27"
+url = "https://www.youtube.com/playlist?list=PLHd5WXDxcD4AVM30YhkOg4AQBNvd6kILE"
 #mark_playlist_as_downloaded(url)
 #download_playlist(url, use_history=True, excluding=["T23AY5gYhpE"], starting="WTKrJ-nEy40", until="-AFdwoyNT24")
 download_playlist(url, use_history=True)
