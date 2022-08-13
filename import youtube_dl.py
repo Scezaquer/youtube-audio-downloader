@@ -117,24 +117,30 @@ def download_playlist(url, use_history = True, excluding=[], starting=None, unti
     
     start = 0 if starting is None else ids.index(starting)
     end = len(ids) if until is None else ids.index(until)
-    ids = ids[start:end]
+    ids = ids[start:end+1]
     for x in excluding:
         if x in ids: ids.remove(x)
+    
+    ids = set(ids)
 
     #Don't re-download previously downloaded songs 
-    history = []
+    history = {}
     try:
         with open(f"download_memory/{playlist_id}.txt", "r") as file:
-            history = file.read().split("\n")
+            history = set(file.read().split("\n"))
     except FileNotFoundError: pass
-    for x in history:
-        if x in ids: ids.remove(x)
 
-    print(ids, len(ids))
+    for x in history:
+        if x in ids: 
+            ids.remove(x)
+        #else: print(f"Here! {x}")
+
+    print(f"Downloading {len(ids)} videos")
 
     for x in ids:
         download_ytvid_as_mp3(x)
         save_download(playlist_id, [x])
+        print("\n")
 
 def save_download(playlist_id, ids):
     with open(f"download_memory/{playlist_id}.txt", "a") as file:
@@ -144,8 +150,11 @@ def mark_playlist_as_downloaded(url):
     #Marks the entire playlist as having been already downloaded without installing anything
     ids = get_playlist_ids(url)
     playlist_id = url[-34:]
-    with open(f"download_memory/{playlist_id}.txt", "a") as file:
+    with open(f"download_memory/{playlist_id}.txt", "w") as file:
         for x in ids: file.write(x + "\n")
 
 url = "https://www.youtube.com/playlist?list=PLHd5WXDxcD4C0jAxhtFCJoXbMIgG5EB27"
-download_playlist(url, use_history=True, excluding=["T23AY5gYhpE"], starting="WTKrJ-nEy40", until="-AFdwoyNT24")
+
+#mark_playlist_as_downloaded(url)
+#download_playlist(url, use_history=True, excluding=["T23AY5gYhpE"], starting="WTKrJ-nEy40", until="-AFdwoyNT24")
+download_playlist(url, use_history=True)
