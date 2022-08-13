@@ -3,7 +3,7 @@ import eyed3
 import requests
 import logging
 from pydub import AudioSegment
-from os import remove
+from os import remove, mkdir, path
 from re import split, finditer
 import traceback
 
@@ -117,6 +117,16 @@ def download_playlist(url, use_history = True, excluding=[], starting=None, unti
     Downloads an entire youtube playlist using the specified url, with possibility to exclude some
     and specify start/end
     """
+
+    #Creates the necessary directories if they don't exist already
+    if not path.exists("audio"):
+        mkdir("audio")
+    if not path.exists("download_memory"):
+        mkdir("download_memory")
+    if not path.exists("reformat"):
+        mkdir("reformat")
+    if not path.exists("reformatted"):
+        mkdir("reformatted")
 
     playlist_id = url[-34:]
     ids = get_playlist_ids(url)
