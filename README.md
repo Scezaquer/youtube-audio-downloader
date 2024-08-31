@@ -1,11 +1,10 @@
 # YouTube Playlist Downloader
 
-This Python script allows you to download and convert YouTube playlist videos to MP3 format, complete with proper metadata tagging.
+This Python script allows you to download and convert YouTube playlist videos to MP3 format, complete with proper metadata tagging. Note: This only downloads the audio as this is meant for music playlists, although one might be able to easily change the code to download full videos.
 
 ## Features
 
-- Downloads all videos from a specified YouTube playlist
-- Converts videos to high-quality MP3 files
+- Downloads audio from all videos in a specified YouTube playlist as MP3 files
 - Embeds video thumbnails into MP3 files
 - Sets appropriate metadata (title, artist, album) for each MP3 file
 - Sanitizes filenames to ensure compatibility across different operating systems
