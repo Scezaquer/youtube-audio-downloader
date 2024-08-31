@@ -1,0 +1,3 @@
+yt-dlp==2024.8.6
+eyed3==0.9.7
+google-api-python-client==2.142.0
