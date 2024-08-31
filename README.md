@@ -79,7 +79,7 @@ This Python script allows you to download and convert YouTube playlist videos to
 
 ## Contributing
 
-Contributions, issues, and feature requests are welcome. Feel free to check [issues page](link-to-your-issues-page) if you want to contribute.
+Contributions, issues, and feature requests are welcome. Feel free to check [issues page](https://github.com/Scezaquer/youtube-audio-downloader/issues) if you want to contribute.
 
 ## License
 
